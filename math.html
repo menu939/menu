@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>外星人數學大冒險 - 數字選擇版</title>
+    <title>外星人數學大冒險 - 一年級不進退位版</title>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
@@ -355,13 +355,26 @@
         }
         
         op = Math.random() > 0.5 ? '+' : '-';
+
         if (op === '+') {
-            numA = Math.floor(Math.random() * 70) + 15;
-            numB = Math.floor(Math.random() * 70) + 15;
+            // 不進位加法：十位數 (1~8), 個位數相加小於10
+            let t1 = Math.floor(Math.random() * 8) + 1;
+            let u1 = Math.floor(Math.random() * 9);
+            let t2 = Math.floor(Math.random() * (9 - t1)) + 1; // 確保十位和不大於 9
+            let u2 = Math.floor(Math.random() * (10 - u1));   // 確保個位和小於 10
+            
+            numA = t1 * 10 + u1;
+            numB = t2 * 10 + u2;
             correctAnswer = numA + numB;
         } else {
-            numA = Math.floor(Math.random() * 70) + 30;
-            numB = Math.floor(Math.random() * (numA - 10)) + 10;
+            // 不退位減法：確保被減數的十位、個位都大於或等於減數
+            let t1 = Math.floor(Math.random() * 8) + 2; // 2~9
+            let u1 = Math.floor(Math.random() * 9) + 1; // 1~9
+            let t2 = Math.floor(Math.random() * (t1 - 1)) + 1; // 1 ~ t1-1
+            let u2 = Math.floor(Math.random() * u1);           // 0 ~ u1-1
+            
+            numA = t1 * 10 + u1;
+            numB = t2 * 10 + u2;
             correctAnswer = numA - numB;
         }
 
@@ -440,7 +453,7 @@
         } else {
             playSound('wrong');
             feedback.style.color = "#ff453a";
-            feedback.innerText = "⚠️ 哎呀能量偏離！提示：再算一次個位和十位有沒有進位/借位喔！";
+            feedback.innerText = "⚠️ 哎呀能量偏離！再試一次看看！";
             
             // 顯示畫面大型 X 特效
             const overlay = document.getElementById('wrongOverlay');
