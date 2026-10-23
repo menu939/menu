@@ -1,470 +1,378 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>外星人數學大冒險 - 一年級不進退位版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>變形金剛：數學防衛戰</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            --card-bg: rgba(255, 255, 255, 0.12);
-            --card-border: rgba(255, 255, 255, 0.25);
-            --text-color: #ffffff;
-            --accent-color: #0a84ff; /* iOS 藍色 */
-            --accent-hover: #0062d2;
-            --key-bg: rgba(255, 255, 255, 0.18);
-            --key-active: rgba(255, 255, 255, 0.4);
+            --dark-panel: #111418;
+            --cyber-yellow: #ffe600;
+            --cyber-blue: #00e5ff;
+            --cyber-red: #ff2a2a;
+            --text-color: #fff;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0d10;
+            background-image: 
+                radial-gradient(circle at 50% 40%, rgba(255, 215, 0, 0.2) 0%, rgba(10, 10, 15, 0.9) 70%),
+                linear-gradient(rgba(255, 230, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 230, 0, 0.04) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
             color: var(--text-color);
             margin: 0;
-            padding: 15px;
+            padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
-        /* 煙花畫布層 */
-        #fireworksCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
+        @keyframes shake {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            20% { transform: translate(-10px, 2px) rotate(-1deg); }
+            40% { transform: translate(10px, -2px) rotate(1deg); }
+            60% { transform: translate(-8px, 1px) rotate(-0.5deg); }
+            80% { transform: translate(8px, -1px) rotate(0.5deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .shake-effect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .container {
+            background-color: var(--dark-panel);
+            border: 4px solid var(--cyber-yellow);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 230, 0, 0.3);
             width: 100%;
-            height: 100%;
-            pointer-events: none;
+            max-width: 480px;
+            padding: 24px;
+            box-sizing: border-box;
+            text-align: center;
+            transition: all 0.2s;
             z-index: 10;
         }
 
-        .game-container {
-            background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--card-border);
-            max-width: 400px;
-            width: 100%;
-            padding: 20px 25px;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 5;
+        .container.success-flash {
+            border-color: var(--cyber-blue);
+            box-shadow: 0 0 35px rgba(0, 229, 255, 0.9);
         }
 
-        .alien-avatar {
-            font-size: 3.2rem;
-            margin-bottom: 2px;
-            animation: float 3s ease-in-out infinite;
+        .container.error-flash {
+            border-color: var(--cyber-red);
+            box-shadow: 0 0 35px rgba(255, 42, 42, 0.9);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+        h1 {
+            color: var(--cyber-yellow);
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px #000;
         }
 
-        h2 {
-            margin: 2px 0 12px 0;
-            font-size: 1.3rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        .subtitle {
+            color: var(--cyber-blue);
+            font-size: 1rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            font-weight: bold;
         }
 
-        .stats-bar {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(0, 0, 0, 0.25);
-            padding: 8px 12px;
-            border-radius: 14px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
+        .screen {
+            display: none;
         }
 
-        /* 直式計算區域 */
+        .screen.active {
+            display: block;
+        }
+
         .vertical-math {
-            font-size: 2.6rem;
-            font-weight: 700;
-            text-align: right;
             display: inline-block;
-            margin: 10px 0 15px 0;
-            border-bottom: 4px solid rgba(255, 255, 255, 0.7);
-            padding-bottom: 8px;
-            letter-spacing: 12px;
+            font-family: monospace;
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: right;
+            margin: 10px 0 20px 0;
+            background: #1f242d;
+            color: #fff;
+            padding: 15px 40px;
+            border-radius: 12px;
+            border: 3px solid var(--cyber-yellow);
+            box-shadow: inset 0 0 15px rgba(255, 230, 0, 0.2);
         }
 
         .math-row {
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            position: relative;
+            letter-spacing: 12px;
         }
 
-        .operator {
-            position: absolute;
-            left: -32px;
+        .math-operator {
+            margin-right: 20px;
+            color: var(--cyber-yellow);
         }
 
-        /* 數字顯示格 */
-        .digit-inputs-container {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin: 10px 0;
-            min-height: 60px;
-            align-items: center;
+        .math-line {
+            border-bottom: 5px solid #fff;
+            margin: 5px 0 15px 0;
+            width: 150px;
+            margin-left: auto;
         }
 
-        .digit-box {
-            font-size: 2rem;
-            font-weight: 600;
-            width: 50px;
-            height: 58px;
-            line-height: 58px;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.35);
-            background: rgba(0, 0, 0, 0.25);
-            color: white;
-            border-radius: 14px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-        }
-
-        .digit-box.active {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 12px rgba(10, 132, 255, 0.7);
-            background: rgba(10, 132, 255, 0.15);
-        }
-
-        /* 觸控數字選擇盤 (iOS 風格) */
-        .keypad-grid {
+        .number-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 10px;
             margin-top: 15px;
         }
 
-        .key-btn {
+        .num-btn {
+            background: linear-gradient(135deg, #2b313b 0%, #1a1f26 100%);
+            color: var(--cyber-yellow);
+            border: 2px solid var(--cyber-yellow);
             font-size: 1.5rem;
-            font-weight: 600;
-            padding: 12px 0;
-            background: var(--key-bg);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: background 0.15s, transform 0.1s;
-        }
-
-        .key-btn:active {
-            background: var(--key-active);
-            transform: scale(0.95);
-        }
-
-        .key-btn.action-key {
-            background: rgba(255, 69, 58, 0.25);
-            border-color: rgba(255, 69, 58, 0.4);
-        }
-
-        .key-btn.submit-key {
-            background: var(--accent-color);
-            border-color: var(--accent-color);
-            font-size: 1.2rem;
-        }
-
-        #feedback {
-            font-size: 1rem;
-            margin-top: 12px;
-            min-height: 32px;
-            line-height: 1.3;
-        }
-
-        /* 答錯時的大型 X 提示特效 */
-        #wrongOverlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            font-size: 8rem;
-            color: #ff453a;
             font-weight: bold;
-            z-index: 20;
-            pointer-events: none;
-            transition: transform 0.2s ease-out, opacity 0.2s;
-            opacity: 0;
-            text-shadow: 0 0 25px rgba(0,0,0,0.8);
+            padding: 12px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        #wrongOverlay.show {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
+        .num-btn:hover {
+            background: var(--cyber-yellow);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 230, 0, 0.4);
+        }
+
+        .num-btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--cyber-yellow) 0%, #cca300 100%);
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+        }
+
+        .feedback {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 35px;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        .feedback.success {
+            color: var(--cyber-blue);
+        }
+
+        .feedback.error {
+            color: var(--cyber-red);
+        }
+
+        .progress-info {
+            font-size: 1rem;
+            color: var(--cyber-yellow);
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        p {
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
-<canvas id="fireworksCanvas"></canvas>
-<div id="wrongOverlay">❌</div>
-
-<div class="game-container">
-    <div class="alien-avatar">🛸👾</div>
-    <h2>外星人數學大冒險</h2>
-    
-    <div class="stats-bar">
-        <span>關卡: <b id="level">1</b> / 5</span>
-        <span>進度: <b id="current">1</b> / 50</span>
-        <span>⭐ <b id="score">0</b></span>
+<div class="container" id="main-container">
+    <!-- 開始畫面 -->
+    <div id="start-screen" class="screen active">
+        <h1>變型金剛</h1>
+        <div class="subtitle">AUTOBOTS MATH PROTOCOL</div>
+        <p style="margin: 25px 0; line-height: 1.6;">指揮官，賽博坦能源庫告急！<br>請完成 20 道個位數數學防衛直式計算，點擊 0-9 數字格子回答，為基地充能！</p>
+        <button class="btn" onclick="startMathGame()">啟動系統</button>
     </div>
-    
-    <div class="vertical-math">
-        <div id="num1">25</div>
-        <div class="math-row">
-            <span id="operator" class="operator">+</span>
-            <span id="num2">17</span>
+
+    <!-- 遊戲畫面 -->
+    <div id="game-screen" class="screen">
+        <div class="progress-info" id="progress-text">進度：1 / 20</div>
+        
+        <!-- 直式數學顯示區 -->
+        <div class="vertical-math">
+            <div class="math-row" id="num1-row">5</div>
+            <div class="math-row">
+                <span class="math-operator" id="operator-sign">+</span>
+                <span id="num2-row">3</span>
+            </div>
+            <div class="math-line"></div>
+            <div id="selected-answer-display" style="color: var(--cyber-yellow); text-align: right; min-height: 50px;">?</div>
         </div>
-    </div>
-    
-    <!-- 答案數字顯示格 -->
-    <div class="digit-inputs-container" id="digitInputsContainer"></div>
 
-    <!-- 數字選擇按鍵盤 -->
-    <div class="keypad-grid">
-        <button class="key-btn" onclick="pressNum(1)">1</button>
-        <button class="key-btn" onclick="pressNum(2)">2</button>
-        <button class="key-btn" onclick="pressNum(3)">3</button>
-        <button class="key-btn" onclick="pressNum(4)">4</button>
-        <button class="key-btn" onclick="pressNum(5)">5</button>
-        <button class="key-btn" onclick="pressNum(6)">6</button>
-        <button class="key-btn" onclick="pressNum(7)">7</button>
-        <button class="key-btn" onclick="pressNum(8)">8</button>
-        <button class="key-btn" onclick="pressNum(9)">9</button>
-        <button class="key-btn action-key" onclick="clearLastDigit()">⌫</button>
-        <button class="key-btn" onclick="pressNum(0)">0</button>
-        <button class="key-btn submit-key" onclick="checkAnswer()">發射🚀</button>
+        <!-- 數字格子選擇區 (0 ~ 9) -->
+        <div class="number-grid" id="number-grid"></div>
+
+        <div class="feedback" id="feedback-msg"></div>
     </div>
-    
-    <div id="feedback"></div>
+
+    <!-- 結算畫面 -->
+    <div id="result-screen" class="screen">
+        <h1>任務完成</h1>
+        <div class="subtitle">CYBERTRON SECURED</div>
+        <p id="final-score" style="font-size: 1.4rem; margin: 30px 0;"></p>
+        <button class="btn" onclick="resetMathGame()">再次出擊</button>
+    </div>
 </div>
 
 <script>
-    let currentQ = 1;
+    let questions = [];
+    let currentIndex = 0;
     let score = 0;
-    let numA, numB, op, correctAnswer;
-    let expectedLength = 2; 
-    let currentInputDigits = [];
+    let answered = false;
 
-    // 煙花粒子系統
-    const canvas = document.getElementById('fireworksCanvas');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    class Particle {
-        constructor(x, y, color) {
-            this.x = x;
-            this.y = y;
-            this.color = color;
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 6 + 2;
-            this.vx = Math.cos(angle) * speed;
-            this.vy = Math.sin(angle) * speed;
-            this.alpha = 1;
-            this.decay = Math.random() * 0.015 + 0.01;
-        }
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.vy += 0.08;
-            this.alpha -= this.decay;
-        }
-        draw() {
-            ctx.save();
-            ctx.globalAlpha = this.alpha;
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-    }
-
-    function createFireworks() {
-        const colors = ['#0a84ff', '#30d158', '#ff9f0a', '#ff453a', '#bf5af2', '#ffff00'];
-        const cx = window.innerWidth / 2;
-        const cy = window.innerHeight / 2 - 50;
-        for (let i = 0; i < 60; i++) {
-            particles.push(new Particle(cx, cy, colors[Math.floor(Math.random() * colors.length)]));
-        }
-    }
-
-    function animateFireworks() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach((p, index) => {
-            p.update();
-            p.draw();
-            if (p.alpha <= 0) particles.splice(index, 1);
-        });
-        if (particles.length > 0) {
-            requestAnimationFrame(animateFireworks);
-        }
-    }
-
-    // 音效合成
-    function playSound(type) {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (type === 'correct') {
-            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.12);
-            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.35);
-        } else {
-            osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(130, audioCtx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.35);
-        }
-    }
-
-    function generateQuestion() {
-        if (currentQ > 50) {
-            alert("🌟 太神啦！你成功解救了外星星球，成為數學宇宙霸主！");
-            currentQ = 1;
-            score = 0;
-        }
+    // 產生 20 題不重複的個位數加減法
+    function generateQuestions() {
+        let set = new Set();
+        let list = [];
         
-        op = Math.random() > 0.5 ? '+' : '-';
+        while(list.length < 20) {
+            let isAdd = Math.random() > 0.5;
+            let n1 = Math.floor(Math.random() * 9) + 1;
+            let n2 = Math.floor(Math.random() * 9) + 1;
+            
+            let ans = isAdd ? (n1 + n2) : (n1 - n2);
+            
+            if (!isAdd && ans < 0) {
+                let temp = n1; n1 = n2; n2 = temp;
+                ans = n1 - n2;
+            }
+            if (isAdd && ans > 9) continue;
 
-        if (op === '+') {
-            // 不進位加法：十位數 (1~8), 個位數相加小於10
-            let t1 = Math.floor(Math.random() * 8) + 1;
-            let u1 = Math.floor(Math.random() * 9);
-            let t2 = Math.floor(Math.random() * (9 - t1)) + 1; // 確保十位和不大於 9
-            let u2 = Math.floor(Math.random() * (10 - u1));   // 確保個位和小於 10
+            let key = `${n1}${isAdd ? '+' : '-'}${n2}`;
             
-            numA = t1 * 10 + u1;
-            numB = t2 * 10 + u2;
-            correctAnswer = numA + numB;
-        } else {
-            // 不退位減法：確保被減數的十位、個位都大於或等於減數
-            let t1 = Math.floor(Math.random() * 8) + 2; // 2~9
-            let u1 = Math.floor(Math.random() * 9) + 1; // 1~9
-            let t2 = Math.floor(Math.random() * (t1 - 1)) + 1; // 1 ~ t1-1
-            let u2 = Math.floor(Math.random() * u1);           // 0 ~ u1-1
-            
-            numA = t1 * 10 + u1;
-            numB = t2 * 10 + u2;
-            correctAnswer = numA - numB;
+            if(!set.has(key)) {
+                set.add(key);
+                list.push({ n1: n1, n2: n2, op: isAdd ? '+' : '-', ans: ans });
+            }
         }
-
-        document.getElementById('num1').innerText = numA;
-        document.getElementById('operator').innerText = op;
-        document.getElementById('num2').innerText = numB;
-        document.getElementById('current').innerText = currentQ;
-        document.getElementById('level').innerText = Math.ceil(currentQ / 10);
-        document.getElementById('score').innerText = score;
-        document.getElementById('feedback').innerText = '';
-
-        expectedLength = correctAnswer.toString().length;
-        currentInputDigits = [];
-        updateDigitDisplay();
+        return list;
     }
 
-    function updateDigitDisplay() {
-        const container = document.getElementById('digitInputsContainer');
-        container.innerHTML = '';
-
-        for (let i = 0; i < expectedLength; i++) {
-            const box = document.createElement('div');
-            box.className = 'digit-box';
+    function startMathGame() {
+        try {
+            questions = generateQuestions();
+            currentIndex = 0;
+            score = 0;
             
-            if (i < currentInputDigits.length) {
-                box.innerText = currentInputDigits[i];
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('game-screen').classList.add('active');
+            document.getElementById('result-screen').classList.remove('active');
+            
+            buildNumberGrid();
+            loadQuestion();
+        } catch (e) {
+            alert('啟動發生錯誤: ' + e.message);
+        }
+    }
+
+    function buildNumberGrid() {
+        let grid = document.getElementById('number-grid');
+        grid.innerHTML = '';
+        for (let i = 0; i <= 9; i++) {
+            let btn = document.createElement('button');
+            btn.className = 'num-btn';
+            btn.innerText = i;
+            btn.onclick = () => selectAnswer(i);
+            grid.appendChild(btn);
+        }
+    }
+
+    function loadQuestion() {
+        answered = false;
+        let q = questions[currentIndex];
+        document.getElementById('progress-text').innerText = `進度：${currentIndex + 1} / 20`;
+        document.getElementById('num1-row').innerText = q.n1;
+        document.getElementById('operator-sign').innerText = q.op;
+        document.getElementById('num2-row').innerText = q.n2;
+        
+        document.getElementById('selected-answer-display').innerText = '?';
+        document.getElementById('feedback-msg').innerText = '';
+        document.getElementById('feedback-msg').className = 'feedback';
+        
+        let container = document.getElementById('main-container');
+        container.classList.remove('success-flash', 'error-flash');
+    }
+
+    function selectAnswer(userVal) {
+        if (answered) return;
+        answered = true;
+
+        let q = questions[currentIndex];
+        let feedback = document.getElementById('feedback-msg');
+        let container = document.getElementById('main-container');
+        let display = document.getElementById('selected-answer-display');
+        
+        display.innerText = userVal;
+
+        container.classList.remove('shake-effect', 'success-flash', 'error-flash');
+        void container.offsetWidth; 
+
+        if (userVal === q.ans) {
+            score++;
+            feedback.innerText = '太棒了！';
+            feedback.className = 'feedback success';
+            container.classList.add('success-flash');
+        } else {
+            feedback.innerText = '差一點！';
+            feedback.className = 'feedback error';
+            container.classList.add('shake-effect', 'error-flash');
+        }
+
+        setTimeout(() => {
+            currentIndex++;
+            if (currentIndex < questions.length) {
+                loadQuestion();
             } else {
-                box.innerText = '';
+                showResult();
             }
-
-            if (i === currentInputDigits.length) {
-                box.classList.add('active'); // 高亮目前輸入位數
-            }
-
-            container.appendChild(box);
-        }
+        }, 900);
     }
 
-    function pressNum(num) {
-        if (currentInputDigits.length < expectedLength) {
-            currentInputDigits.push(num);
-            updateDigitDisplay();
-        }
+    function showResult() {
+        document.getElementById('game-screen').classList.remove('active');
+        document.getElementById('result-screen').classList.add('active');
+        document.getElementById('final-score').innerHTML = `防衛結算：答對 <span style="color: var(--cyber-blue);">${score}</span> / 20 題<br><br>${score === 20 ? '「博派核心全開，完美防衛！」' : '「系統運作正常，再接再厲！」'}`;
     }
 
-    function clearLastDigit() {
-        if (currentInputDigits.length > 0) {
-            currentInputDigits.pop();
-            updateDigitDisplay();
-        }
+    function resetMathGame() {
+        document.getElementById('result-screen').classList.remove('active');
+        document.getElementById('start-screen').classList.add('active');
     }
-
-    function checkAnswer() {
-        const feedback = document.getElementById('feedback');
-
-        if (currentInputDigits.length < expectedLength) {
-            feedback.style.color = "#ff9f0a";
-            feedback.innerText = "太空人！請點擊數字按紐填滿答案格喔！";
-            return;
-        }
-
-        const userAns = parseInt(currentInputDigits.join(''));
-
-        if (userAns === correctAnswer) {
-            playSound('correct');
-            score += 10;
-            feedback.style.color = "#30d158";
-            feedback.innerText = "🎯 太棒了！能量補充成功！🎉";
-            
-            // 觸發煙花特效
-            createFireworks();
-            animateFireworks();
-
-            currentQ++;
-            setTimeout(generateQuestion, 1600);
-        } else {
-            playSound('wrong');
-            feedback.style.color = "#ff453a";
-            feedback.innerText = "⚠️ 哎呀能量偏離！再試一次看看！";
-            
-            // 顯示畫面大型 X 特效
-            const overlay = document.getElementById('wrongOverlay');
-            overlay.classList.add('show');
-            setTimeout(() => {
-                overlay.classList.remove('show');
-            }, 600);
-        }
-    }
-
-    generateQuestion();
 </script>
 
 </body>
