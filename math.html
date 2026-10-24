@@ -2,378 +2,747 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>變形金剛：數學防衛戰</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>森林動物數學大冒險 - K3 闖關遊戲</title>
+    <!-- Tailwind CSS for Responsive UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --dark-panel: #111418;
-            --cyber-yellow: #ffe600;
-            --cyber-blue: #00e5ff;
-            --cyber-red: #ff2a2a;
-            --text-color: #fff;
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@500;700;900&display=swap');
+
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b0d10;
-            background-image: 
-                radial-gradient(circle at 50% 40%, rgba(255, 215, 0, 0.2) 0%, rgba(10, 10, 15, 0.9) 70%),
-                linear-gradient(rgba(255, 230, 0, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 230, 0, 0.04) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
-            color: var(--text-color);
+            font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            color: #2d5a27;
+        }
+
+        /* Wooden Panel Design */
+        .wood-container {
+            background: #8d5b4c;
+            border: 6px solid #5c3a21;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3), inset 0 3px 0 rgba(255,255,255,0.2);
+            border-radius: 28px;
+        }
+
+        .paper-card {
+            background: #fffdf0;
+            border: 4px solid #e0c9a6;
+            box-shadow: inset 0 0 12px rgba(180, 140, 90, 0.15), 0 6px 15px rgba(0,0,0,0.08);
+            border-radius: 22px;
+        }
+
+        /* Difficulty Buttons & Tabs */
+        .level-btn {
+            background: linear-gradient(180deg, #aed581 0%, #7cb342 100%);
+            border: 3px solid #33691e;
+            box-shadow: 0 5px 0 #2e7d32;
+            transition: all 0.15s ease;
+        }
+
+        .level-btn.active {
+            background: linear-gradient(180deg, #ffb74d 0%, #f57c00 100%) !important;
+            border-color: #e65100 !important;
+            box-shadow: 0 2px 0 #bf360c !important;
+            transform: translateY(3px);
+        }
+
+        .btn-option {
+            background: linear-gradient(180deg, #ffffff 0%, #f1f8e9 100%);
+            border: 4px solid #aed581;
+            box-shadow: 0 6px 0 #7cb342, 0 8px 12px rgba(0,0,0,0.08);
+            border-radius: 20px;
+            transition: all 0.12s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-option:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #7cb342;
+        }
+
+        .btn-option.correct-anim {
+            animation: pulseGreen 0.5s ease;
+            background: linear-gradient(180deg, #aed581 0%, #7cb342 100%) !important;
+            border-color: #33691e !important;
+            color: white !important;
+        }
+
+        .btn-option.wrong-anim {
+            animation: shakeRed 0.4s ease;
+            background: linear-gradient(180deg, #ff8a80 0%, #e53935 100%) !important;
+            border-color: #b71c1c !important;
+            color: white !important;
+        }
+
+        @keyframes pulseGreen {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes shakeRed {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        /* Number Bond Visual Tree styling */
+        .bond-circle {
+            background: #ffffff;
+            border: 4px solid #81c784;
+            box-shadow: 0 6px 0 #4caf50, inset 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
         }
 
-        @keyframes shake {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            20% { transform: translate(-10px, 2px) rotate(-1deg); }
-            40% { transform: translate(10px, -2px) rotate(1deg); }
-            60% { transform: translate(-8px, 1px) rotate(-0.5deg); }
-            80% { transform: translate(8px, -1px) rotate(0.5deg); }
-            100% { transform: translate(0, 0) rotate(0deg); }
+        .bond-target {
+            border-color: #ffb74d;
+            box-shadow: 0 6px 0 #f57c00, inset 0 2px 4px rgba(0,0,0,0.1);
+            background: #fff8e1;
         }
 
-        .shake-effect {
-            animation: shake 0.4s ease-in-out;
-        }
-
-        .container {
-            background-color: var(--dark-panel);
-            border: 4px solid var(--cyber-yellow);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 230, 0, 0.3);
-            width: 100%;
-            max-width: 480px;
-            padding: 24px;
-            box-sizing: border-box;
-            text-align: center;
-            transition: all 0.2s;
-            z-index: 10;
-        }
-
-        .container.success-flash {
-            border-color: var(--cyber-blue);
-            box-shadow: 0 0 35px rgba(0, 229, 255, 0.9);
-        }
-
-        .container.error-flash {
-            border-color: var(--cyber-red);
-            box-shadow: 0 0 35px rgba(255, 42, 42, 0.9);
-        }
-
-        h1 {
-            color: var(--cyber-yellow);
-            font-size: 2rem;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 0px #000;
-        }
-
-        .subtitle {
-            color: var(--cyber-blue);
-            font-size: 1rem;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        .vertical-math {
-            display: inline-block;
-            font-family: monospace;
-            font-size: 3rem;
-            font-weight: bold;
-            text-align: right;
-            margin: 10px 0 20px 0;
-            background: #1f242d;
-            color: #fff;
-            padding: 15px 40px;
-            border-radius: 12px;
-            border: 3px solid var(--cyber-yellow);
-            box-shadow: inset 0 0 15px rgba(255, 230, 0, 0.2);
-        }
-
-        .math-row {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            letter-spacing: 12px;
-        }
-
-        .math-operator {
-            margin-right: 20px;
-            color: var(--cyber-yellow);
-        }
-
-        .math-line {
-            border-bottom: 5px solid #fff;
-            margin: 5px 0 15px 0;
-            width: 150px;
-            margin-left: auto;
-        }
-
-        .number-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .num-btn {
-            background: linear-gradient(135deg, #2b313b 0%, #1a1f26 100%);
-            color: var(--cyber-yellow);
-            border: 2px solid var(--cyber-yellow);
-            font-size: 1.5rem;
-            font-weight: bold;
-            padding: 12px 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .num-btn:hover {
-            background: var(--cyber-yellow);
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(255, 230, 0, 0.4);
-        }
-
-        .num-btn:active {
-            transform: translateY(1px);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, var(--cyber-yellow) 0%, #cca300 100%);
-            color: #000;
-            border: none;
-            padding: 14px 28px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 20px;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
-        }
-
-        .feedback {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin: 15px 0;
-            min-height: 35px;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        .feedback.success {
-            color: var(--cyber-blue);
-        }
-
-        .feedback.error {
-            color: var(--cyber-red);
-        }
-
-        .progress-info {
-            font-size: 1rem;
-            color: var(--cyber-yellow);
-            margin-bottom: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        p {
-            color: #fff;
+        .bond-line {
+            stroke: #8d6e63;
+            stroke-width: 6;
+            stroke-linecap: round;
         }
     </style>
 </head>
-<body>
+<body class="p-3 sm:p-6 flex items-center justify-center min-h-screen">
 
-<div class="container" id="main-container">
-    <!-- 開始畫面 -->
-    <div id="start-screen" class="screen active">
-        <h1>變型金剛</h1>
-        <div class="subtitle">AUTOBOTS MATH PROTOCOL</div>
-        <p style="margin: 25px 0; line-height: 1.6;">指揮官，賽博坦能源庫告急！<br>請完成 20 道個位數數學防衛直式計算，點擊 0-9 數字格子回答，為基地充能！</p>
-        <button class="btn" onclick="startMathGame()">啟動系統</button>
-    </div>
+    <!-- Game Main Outer Card -->
+    <div class="w-full max-w-5xl wood-container p-4 sm:p-6 relative">
 
-    <!-- 遊戲畫面 -->
-    <div id="game-screen" class="screen">
-        <div class="progress-info" id="progress-text">進度：1 / 20</div>
-        
-        <!-- 直式數學顯示區 -->
-        <div class="vertical-math">
-            <div class="math-row" id="num1-row">5</div>
-            <div class="math-row">
-                <span class="math-operator" id="operator-sign">+</span>
-                <span id="num2-row">3</span>
+        <!-- Top Header: Title, Audio Control, Mascot Info -->
+        <div class="flex items-center justify-between bg-emerald-950/40 rounded-2xl p-3 mb-4 text-white border-2 border-emerald-600/50">
+            <div class="flex items-center space-x-3">
+                <span id="mascot-avatar" class="text-3xl sm:text-4xl bg-white/20 p-2 rounded-full">🐻</span>
+                <div>
+                    <h1 class="text-lg sm:text-2xl font-black text-amber-300 tracking-wide">森林動物數學大冒險</h1>
+                    <div class="text-xs sm:text-sm text-emerald-200 font-bold" id="mascot-title">小熊隊長 陪你一起闖關</div>
+                </div>
             </div>
-            <div class="math-line"></div>
-            <div id="selected-answer-display" style="color: var(--cyber-yellow); text-align: right; min-height: 50px;">?</div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Score & Acorns -->
+                <div class="bg-amber-900/60 px-3 py-1.5 rounded-xl border border-amber-500/40 text-right">
+                    <span class="text-xs text-amber-200 block font-bold">獲得松果</span>
+                    <span id="score-text" class="text-lg sm:text-2xl font-black text-yellow-300">🌰 0</span>
+                </div>
+                <!-- Audio Sound Switch -->
+                <button onclick="toggleSound()" id="sound-btn" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl text-xl transition">
+                    🔊
+                </button>
+            </div>
         </div>
 
-        <!-- 數字格子選擇區 (0 ~ 9) -->
-        <div class="number-grid" id="number-grid"></div>
+        <!-- Main Layout: Left Sidebar for Difficulty, Right Panel for Math Quest -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
-        <div class="feedback" id="feedback-msg"></div>
+            <!-- Sidebar / Difficulty Selection (Left side on Desktop, Top Tabs on Mobile) -->
+            <div class="lg:col-span-1 bg-emerald-900/30 p-3 rounded-2xl border-2 border-emerald-700/40 flex lg:flex-col justify-between space-x-2 lg:space-x-0 lg:space-y-3">
+                <div class="text-white text-xs sm:text-sm font-black hidden lg:block text-center py-1 bg-emerald-800/60 rounded-lg mb-1">
+                    🎯 選擇闖關難度
+                </div>
+
+                <button onclick="changeDifficulty('low')" id="btn-diff-low" class="level-btn active flex-1 lg:w-full py-2.5 sm:py-3 px-2 rounded-xl text-white font-black text-sm sm:text-base flex flex-col lg:flex-row items-center justify-center lg:justify-start lg:space-x-2">
+                    <span class="text-lg">🌱</span>
+                    <span>初級 (低)</span>
+                </button>
+
+                <button onclick="changeDifficulty('mid')" id="btn-diff-mid" class="level-btn flex-1 lg:w-full py-2.5 sm:py-3 px-2 rounded-xl text-white font-black text-sm sm:text-base flex flex-col lg:flex-row items-center justify-center lg:justify-start lg:space-x-2">
+                    <span class="text-lg">🌿</span>
+                    <span>中級 (中)</span>
+                </button>
+
+                <button onclick="changeDifficulty('high')" id="btn-diff-high" class="level-btn flex-1 lg:w-full py-2.5 sm:py-3 px-2 rounded-xl text-white font-black text-sm sm:text-base flex flex-col lg:flex-row items-center justify-center lg:justify-start lg:space-x-2">
+                    <span class="text-lg">🌲</span>
+                    <span>高級 (高)</span>
+                </button>
+            </div>
+
+            <!-- Main Interactive Play Area -->
+            <div class="lg:col-span-3 space-y-4">
+
+                <!-- Progress Bar & Quest Info -->
+                <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-amber-100 bg-amber-950/30 px-3 py-1.5 rounded-xl border border-amber-600/30">
+                    <span id="level-badge" class="bg-amber-400 text-amber-950 px-2.5 py-0.5 rounded-full font-black">🌱 初級 5以內計算</span>
+                    <span id="progress-text" class="text-amber-200">第 1 / 10 題</span>
+                </div>
+
+                <!-- Progress Bar Visual Fill -->
+                <div class="w-full bg-emerald-950/60 rounded-full h-3 p-0.5 border border-emerald-600/40">
+                    <div id="progress-bar" class="bg-gradient-to-r from-amber-400 to-yellow-300 h-full rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
+
+                <!-- Question Stage -->
+                <div id="game-stage" class="space-y-4">
+                    <!-- Question Paper Container -->
+                    <div class="paper-card p-4 sm:p-6 text-center relative min-h-[260px] flex flex-col items-center justify-center">
+                        <span id="category-tag" class="bg-emerald-100 text-emerald-800 text-xs sm:text-sm font-extrabold px-3 py-1 rounded-full border border-emerald-300 mb-2">
+                            分解與合成圖解
+                        </span>
+
+                        <!-- Dynamic Question Header -->
+                        <div id="question-prompt" class="text-lg sm:text-2xl font-black text-amber-950 mb-2">
+                            載入題目中...
+                        </div>
+
+                        <!-- Graphical Diagram Display Area (Focus for Requirement 1: Graphic Number Bonds) -->
+                        <div id="graphic-container" class="w-full flex items-center justify-center my-2 min-h-[140px]">
+                            <!-- Diagram injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Multiple Choice Grid -->
+                    <div id="options-grid" class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <!-- 4 Options Generated Here -->
+                    </div>
+
+                    <!-- Feedback Alert Text -->
+                    <div id="feedback-msg" class="text-center font-black text-base sm:text-xl min-h-[28px] h-7">
+                    </div>
+                </div>
+
+                <!-- Completion / Victory Result Screen -->
+                <div id="victory-stage" class="hidden paper-card p-6 text-center space-y-5">
+                    <div class="text-5xl sm:text-6xl animate-bounce">🏆</div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-amber-950 mb-1">闖關成功！太棒了！</h2>
+                        <p id="victory-desc" class="text-emerald-800 font-bold text-sm sm:text-base">你完成了初級的所有數學考驗！</p>
+                    </div>
+
+                    <!-- Stars Display -->
+                    <div id="stars-row" class="text-4xl sm:text-5xl flex justify-center space-x-2">
+                        ⭐ ⭐ ⭐
+                    </div>
+
+                    <!-- Victory Summary Box -->
+                    <div class="bg-amber-100/80 rounded-2xl p-4 border-2 border-amber-300 max-w-sm mx-auto space-y-2">
+                        <div class="flex justify-between items-center text-amber-950 font-bold">
+                            <span>本局獲得松果：</span>
+                            <span id="final-score" class="text-2xl font-black text-amber-600">🌰 1000</span>
+                        </div>
+                        <div class="flex justify-between items-center text-emerald-900 font-bold text-sm">
+                            <span>獲得森林榮譽：</span>
+                            <span id="final-badge" class="text-emerald-700 font-black">森林數理小超人 🥇</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+                        <button onclick="restartCurrentLevel()" class="btn-option bg-amber-400 text-amber-950 font-black text-lg py-3 px-6 rounded-xl flex-1">
+                            再玩一次 🔄
+                        </button>
+                        <button onclick="upgradeDifficulty()" class="level-btn text-white font-black text-lg py-3 px-6 rounded-xl flex-1">
+                            挑戰下一級 🚀
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 
-    <!-- 結算畫面 -->
-    <div id="result-screen" class="screen">
-        <h1>任務完成</h1>
-        <div class="subtitle">CYBERTRON SECURED</div>
-        <p id="final-score" style="font-size: 1.4rem; margin: 30px 0;"></p>
-        <button class="btn" onclick="resetMathGame()">再次出擊</button>
-    </div>
-</div>
+    <script>
+        /* ==========================================================================
+           1. Audio Synthesizer (Native Web Audio API - No External Files)
+           ========================================================================== */
+        let audioCtx = null;
+        let soundEnabled = true;
 
-<script>
-    let questions = [];
-    let currentIndex = 0;
-    let score = 0;
-    let answered = false;
-
-    // 產生 20 題不重複的個位數加減法
-    function generateQuestions() {
-        let set = new Set();
-        let list = [];
-        
-        while(list.length < 20) {
-            let isAdd = Math.random() > 0.5;
-            let n1 = Math.floor(Math.random() * 9) + 1;
-            let n2 = Math.floor(Math.random() * 9) + 1;
-            
-            let ans = isAdd ? (n1 + n2) : (n1 - n2);
-            
-            if (!isAdd && ans < 0) {
-                let temp = n1; n1 = n2; n2 = temp;
-                ans = n1 - n2;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
-            if (isAdd && ans > 9) continue;
-
-            let key = `${n1}${isAdd ? '+' : '-'}${n2}`;
-            
-            if(!set.has(key)) {
-                set.add(key);
-                list.push({ n1: n1, n2: n2, op: isAdd ? '+' : '-', ans: ans });
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
             }
         }
-        return list;
-    }
 
-    function startMathGame() {
-        try {
-            questions = generateQuestions();
-            currentIndex = 0;
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'correct') {
+                // High Pitch Sweet Chime
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.12); // G5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                // Gentle Wrong Wobble
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.25);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'win') {
+                // Victory Fanfare
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now + idx * 0.1);
+                    osc.stop(now + idx * 0.1 + 0.3);
+                });
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
+        }
+
+        /* ==========================================================================
+           2. Multi-tier Dynamic Question Pool Generator (Low/Mid/High Levels)
+           ========================================================================== */
+        const FRUITS = ['🍎', '🍓', '🥕', '🌰', '🍄', '🍌'];
+        const MASCOTS = [
+            { name: '小熊隊長', avatar: '🐻' },
+            { name: '聰明狐狸', avatar: '🦊' },
+            { name: '跳跳兔子', avatar: '🐰' },
+            { name: '勤勞松鼠', avatar: '🐿️' }
+        ];
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        // Generate Question Pools per Difficulty
+        function generateQuestionsForDifficulty(diff) {
+            const pool = [];
+
+            if (diff === 'low') {
+                // --- LOW LEVEL: Numbers 1-5 ---
+                
+                // 1. Counting 1-5 (50 Qs)
+                for (let i = 0; i < 50; i++) {
+                    const count = getRandomInt(1, 5);
+                    const fruit = FRUITS[i % FRUITS.length];
+                    pool.push({
+                        type: 'count',
+                        category: '🌱 5以內數數',
+                        prompt: `數一數，樹上有幾個 ${fruit}？`,
+                        count: count,
+                        fruit: fruit,
+                        answer: count,
+                        options: shuffle(generateUniqueOptions(count, 1, 5))
+                    });
+                }
+
+                // 2. Visual Number Bonds (Decomposition) <= 5 (50 Qs) [REQUIREMENT 1: GRAPHIC BONDS]
+                for (let i = 0; i < 50; i++) {
+                    const total = getRandomInt(2, 5);
+                    const left = getRandomInt(1, total - 1);
+                    const right = total - left;
+                    const fruit = FRUITS[i % FRUITS.length];
+                    const missingSide = Math.random() < 0.5 ? 'right' : 'total';
+
+                    let ans = missingSide === 'right' ? right : total;
+                    pool.push({
+                        type: 'bond',
+                        category: '🌱 5以內分解與合成圖解',
+                        prompt: missingSide === 'right' ? `看圖想一想，右邊圓圈該填多少？` : `兩邊合起來，頂部圓圈共有多少？`,
+                        total: total,
+                        left: left,
+                        right: right,
+                        missing: missingSide,
+                        fruit: fruit,
+                        answer: ans,
+                        options: shuffle(generateUniqueOptions(ans, 1, 6))
+                    });
+                }
+
+                // 3. Addition within 5 (50 Qs)
+                for (let i = 0; i < 50; i++) {
+                    const a = getRandomInt(1, 4);
+                    const b = getRandomInt(1, 5 - a);
+                    const sum = a + b;
+                    const fruit = FRUITS[i % FRUITS.length];
+                    pool.push({
+                        type: 'visual_add',
+                        category: '🌱 5以內基礎加法',
+                        prompt: `${a} + ${b} = ?`,
+                        a: a, b: b, fruit: fruit,
+                        answer: sum,
+                        options: shuffle(generateUniqueOptions(sum, 1, 6))
+                    });
+                }
+            } 
+            else if (diff === 'mid') {
+                // --- MID LEVEL: Numbers 1-10 ---
+
+                // 1. Visual Number Bonds <= 10 (70 Qs)
+                for (let i = 0; i < 70; i++) {
+                    const total = getRandomInt(4, 10);
+                    const left = getRandomInt(1, total - 1);
+                    const right = total - left;
+                    const fruit = FRUITS[i % FRUITS.length];
+                    const missingSide = Math.random() < 0.5 ? 'right' : 'left';
+
+                    pool.push({
+                        type: 'bond',
+                        category: '🌿 10以內圖解分解與合成',
+                        prompt: `看圖想一想，問號 ❓ 處應該是多少？`,
+                        total: total,
+                        left: left,
+                        right: right,
+                        missing: missingSide,
+                        fruit: fruit,
+                        answer: missingSide === 'right' ? right : left,
+                        options: shuffle(generateUniqueOptions(missingSide === 'right' ? right : left, 1, 10))
+                    });
+                }
+
+                // 2. Addition & Subtraction within 10 (80 Qs)
+                for (let i = 0; i < 80; i++) {
+                    const isAdd = i % 2 === 0;
+                    if (isAdd) {
+                        const a = getRandomInt(1, 8);
+                        const b = getRandomInt(1, 10 - a);
+                        const ans = a + b;
+                        pool.push({
+                            type: 'equation',
+                            category: '🌿 10以內加法算式',
+                            prompt: `${a} + ${b} = ?`,
+                            visualText: `${'🍎'.repeat(a)} ➕ ${'🍏'.repeat(b)}`,
+                            answer: ans,
+                            options: shuffle(generateUniqueOptions(ans, 1, 10))
+                        });
+                    } else {
+                        const a = getRandomInt(2, 10);
+                        const b = getRandomInt(1, a - 1);
+                        const ans = a - b;
+                        pool.push({
+                            type: 'equation',
+                            category: '🌿 10以內減法算式',
+                            prompt: `${a} - ${b} = ?`,
+                            visualText: `${'🍪'.repeat(a)} (吃掉 ${b} 個)`,
+                            answer: ans,
+                            options: shuffle(generateUniqueOptions(ans, 0, 10))
+                        });
+                    }
+                }
+            } 
+            else if (diff === 'high') {
+                // --- HIGH LEVEL: Advanced 10 Challenge ---
+
+                // 1. Missing Number Bonds (60 Qs)
+                for (let i = 0; i < 60; i++) {
+                    const total = getRandomInt(6, 10);
+                    const left = getRandomInt(2, total - 1);
+                    const right = total - left;
+                    const fruit = FRUITS[i % FRUITS.length];
+
+                    pool.push({
+                        type: 'bond',
+                        category: '🌲 高階分解合成缺數挑戰',
+                        prompt: `頂部為 ${total}，求問號 ❓ 代表的數值！`,
+                        total: total,
+                        left: left,
+                        right: right,
+                        missing: 'total',
+                        fruit: fruit,
+                        answer: total,
+                        options: shuffle(generateUniqueOptions(total, 1, 12))
+                    });
+                }
+
+                // 2. Three-number Addition / Multi-step Math (60 Qs)
+                for (let i = 0; i < 60; i++) {
+                    const a = getRandomInt(1, 4);
+                    const b = getRandomInt(1, 4);
+                    const c = getRandomInt(1, 10 - a - b);
+                    const ans = a + b + c;
+
+                    pool.push({
+                        type: 'equation',
+                        category: '🌲 連加進階挑戰',
+                        prompt: `${a} + ${b} + ${c} = ?`,
+                        visualText: `⭐ 三群小動物合起來是多少？`,
+                        answer: ans,
+                        options: shuffle(generateUniqueOptions(ans, 1, 12))
+                    });
+                }
+
+                // 3. Sequential Logic & Comparison (50 Qs)
+                for (let i = 0; i < 50; i++) {
+                    const start = getRandomInt(1, 6);
+                    const seq = [start, start + 1, start + 2, start + 3];
+                    const blankIdx = getRandomInt(1, 2);
+                    const ans = seq[blankIdx];
+                    seq[blankIdx] = "❓";
+
+                    pool.push({
+                        type: 'equation',
+                        category: '🌲 數字接龍規律',
+                        prompt: `請接下去，問號 ❓ 填入什麼數字？`,
+                        visualText: seq.join(' ,  '),
+                        answer: ans,
+                        options: shuffle(generateUniqueOptions(ans, 1, 10))
+                    });
+                }
+            }
+
+            return shuffle(pool);
+        }
+
+        function generateUniqueOptions(correct, min, max) {
+            const opts = new Set([correct]);
+            while (opts.size < 4) {
+                let wrong = getRandomInt(min, max);
+                if (wrong >= 0) opts.add(wrong);
+            }
+            return Array.from(opts);
+        }
+
+        /* ==========================================================================
+           3. Game Mechanics & Render Engines
+           ========================================================================== */
+        let currentDifficulty = 'low'; // 'low', 'mid', 'high'
+        let currentPool = [];
+        let currentQuestions = [];
+        let currentIdx = 0;
+        let score = 0;
+        let canTap = true;
+
+        const POINTS_MAP = { 'low': 100, 'mid': 150, 'high': 200 };
+
+        function changeDifficulty(diff) {
+            currentDifficulty = diff;
+            
+            // Update Active Level Tab Styles
+            ['low', 'mid', 'high'].forEach(d => {
+                const btn = document.getElementById(`btn-diff-${d}`);
+                if (d === diff) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update Level Header Badge
+            const badge = document.getElementById('level-badge');
+            if (diff === 'low') badge.innerText = '🌱 初級 5以內計算';
+            if (diff === 'mid') badge.innerText = '🌿 中級 10以內計算';
+            if (diff === 'high') badge.innerText = '🌲 高級 10以內進階';
+
+            restartCurrentLevel();
+        }
+
+        function restartCurrentLevel() {
+            currentPool = generateQuestionsForDifficulty(currentDifficulty);
+            currentQuestions = currentPool.slice(0, 10);
+            currentIdx = 0;
             score = 0;
-            
-            document.getElementById('start-screen').classList.remove('active');
-            document.getElementById('game-screen').classList.add('active');
-            document.getElementById('result-screen').classList.remove('active');
-            
-            buildNumberGrid();
-            loadQuestion();
-        } catch (e) {
-            alert('啟動發生錯誤: ' + e.message);
-        }
-    }
+            canTap = true;
 
-    function buildNumberGrid() {
-        let grid = document.getElementById('number-grid');
-        grid.innerHTML = '';
-        for (let i = 0; i <= 9; i++) {
-            let btn = document.createElement('button');
-            btn.className = 'num-btn';
-            btn.innerText = i;
-            btn.onclick = () => selectAnswer(i);
-            grid.appendChild(btn);
-        }
-    }
+            // Pick mascot
+            const mascot = MASCOTS[getRandomInt(0, MASCOTS.length - 1)];
+            document.getElementById('mascot-avatar').innerText = mascot.avatar;
+            document.getElementById('mascot-title').innerText = `${mascot.name} 陪你一起闖關`;
 
-    function loadQuestion() {
-        answered = false;
-        let q = questions[currentIndex];
-        document.getElementById('progress-text').innerText = `進度：${currentIndex + 1} / 20`;
-        document.getElementById('num1-row').innerText = q.n1;
-        document.getElementById('operator-sign').innerText = q.op;
-        document.getElementById('num2-row').innerText = q.n2;
-        
-        document.getElementById('selected-answer-display').innerText = '?';
-        document.getElementById('feedback-msg').innerText = '';
-        document.getElementById('feedback-msg').className = 'feedback';
-        
-        let container = document.getElementById('main-container');
-        container.classList.remove('success-flash', 'error-flash');
-    }
+            document.getElementById('score-text').innerText = `🌰 ${score}`;
+            document.getElementById('game-stage').classList.remove('hidden');
+            document.getElementById('victory-stage').classList.add('hidden');
 
-    function selectAnswer(userVal) {
-        if (answered) return;
-        answered = true;
-
-        let q = questions[currentIndex];
-        let feedback = document.getElementById('feedback-msg');
-        let container = document.getElementById('main-container');
-        let display = document.getElementById('selected-answer-display');
-        
-        display.innerText = userVal;
-
-        container.classList.remove('shake-effect', 'success-flash', 'error-flash');
-        void container.offsetWidth; 
-
-        if (userVal === q.ans) {
-            score++;
-            feedback.innerText = '太棒了！';
-            feedback.className = 'feedback success';
-            container.classList.add('success-flash');
-        } else {
-            feedback.innerText = '差一點！';
-            feedback.className = 'feedback error';
-            container.classList.add('shake-effect', 'error-flash');
+            renderQuestion();
         }
 
-        setTimeout(() => {
-            currentIndex++;
-            if (currentIndex < questions.length) {
-                loadQuestion();
-            } else {
-                showResult();
+        function renderQuestion() {
+            canTap = true;
+            const q = currentQuestions[currentIdx];
+
+            // Progress Header
+            document.getElementById('progress-text').innerText = `第 ${currentIdx + 1} / 10 題`;
+            document.getElementById('progress-bar').style.width = `${((currentIdx + 1) / 10) * 100}%`;
+
+            document.getElementById('category-tag').innerText = q.category;
+            document.getElementById('question-prompt').innerText = q.prompt;
+            document.getElementById('feedback-msg').innerText = '';
+
+            const container = document.getElementById('graphic-container');
+            container.innerHTML = '';
+
+            // RENDER GRAPHIC NUMBER BONDS (REQUIREMENT 1)
+            if (q.type === 'bond') {
+                renderNumberBondGraphic(container, q);
+            } 
+            else if (q.type === 'count') {
+                container.innerHTML = `<div class="text-3xl sm:text-4xl tracking-widest flex flex-wrap justify-center gap-2 max-w-xs">${q.fruit.repeat(q.count)}</div>`;
             }
-        }, 900);
-    }
+            else if (q.type === 'visual_add') {
+                container.innerHTML = `
+                    <div class="flex items-center space-x-3 text-2xl sm:text-3xl font-black">
+                        <div class="bg-amber-100 p-2 rounded-xl border border-amber-300">${q.fruit.repeat(q.a)} (${q.a})</div>
+                        <span class="text-emerald-700">➕</span>
+                        <div class="bg-amber-100 p-2 rounded-xl border border-amber-300">${q.fruit.repeat(q.b)} (${q.b})</div>
+                    </div>
+                `;
+            }
+            else if (q.type === 'equation') {
+                container.innerHTML = `<div class="text-2xl sm:text-3xl font-black text-emerald-800">${q.visualText || ''}</div>`;
+            }
 
-    function showResult() {
-        document.getElementById('game-screen').classList.remove('active');
-        document.getElementById('result-screen').classList.add('active');
-        document.getElementById('final-score').innerHTML = `防衛結算：答對 <span style="color: var(--cyber-blue);">${score}</span> / 20 題<br><br>${score === 20 ? '「博派核心全開，完美防衛！」' : '「系統運作正常，再接再厲！」'}`;
-    }
+            // Render Options
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
 
-    function resetMathGame() {
-        document.getElementById('result-screen').classList.remove('active');
-        document.getElementById('start-screen').classList.add('active');
-    }
-</script>
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option text-amber-950 font-black text-2xl sm:text-3xl py-4 sm:py-5 text-center flex items-center justify-center';
+                btn.innerText = opt;
+                btn.onclick = () => handleAnswer(opt, q.answer, btn);
+                grid.appendChild(btn);
+            });
+        }
 
+        /* Graphic Diagram Renderer for Number Bonds / Decomposition (REQUIREMENT 1) */
+        function renderNumberBondGraphic(container, q) {
+            const isMissingTotal = q.missing === 'total';
+            const isMissingLeft = q.missing === 'left';
+            const isMissingRight = q.missing === 'right';
+
+            const topVal = isMissingTotal ? '❓' : q.total;
+            const leftVal = isMissingLeft ? '❓' : q.left;
+            const rightVal = isMissingRight ? '❓' : q.right;
+
+            const topIcons = isMissingTotal ? '❓' : q.fruit.repeat(q.total);
+            const leftIcons = isMissingLeft ? '❓' : q.fruit.repeat(q.left);
+            const rightIcons = isMissingRight ? '❓' : q.right;
+
+            container.innerHTML = `
+                <div class="relative w-full max-w-xs flex flex-col items-center">
+                    <!-- SVG Connecting Lines -->
+                    <svg class="absolute top-10 w-48 h-20" viewBox="0 0 200 80">
+                        <line x1="100" y1="10" x2="40" y2="70" class="bond-line" />
+                        <line x1="100" y1="10" x2="160" y2="70" class="bond-line" />
+                    </svg>
+
+                    <!-- Top Node (Total Number) -->
+                    <div class="bond-circle bond-target w-20 h-20 sm:w-24 sm:h-24 z-10 mb-6">
+                        <span class="text-xs text-amber-800 font-bold">全部 (合)</span>
+                        <span class="text-2xl sm:text-3xl font-black text-amber-950">${topVal}</span>
+                        <span class="text-xs leading-none">${topIcons}</span>
+                    </div>
+
+                    <!-- Bottom Branch Nodes (Left & Right Parts) -->
+                    <div class="flex justify-between w-full px-4 z-10">
+                        <div class="bond-circle w-16 h-16 sm:w-20 sm:h-20 ${isMissingLeft ? 'bg-amber-100 border-amber-400' : ''}">
+                            <span class="text-xl sm:text-2xl font-black text-emerald-900">${leftVal}</span>
+                            <span class="text-xs">${isMissingLeft ? '' : q.fruit.repeat(q.left)}</span>
+                        </div>
+                        <div class="bond-circle w-16 h-16 sm:w-20 sm:h-20 ${isMissingRight ? 'bg-amber-100 border-amber-400' : ''}">
+                            <span class="text-xl sm:text-2xl font-black text-emerald-900">${rightVal}</span>
+                            <span class="text-xs">${isMissingRight ? '' : q.fruit.repeat(q.right)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAnswer(selected, correct, btn) {
+            if (!canTap) return;
+
+            const feedback = document.getElementById('feedback-msg');
+
+            if (selected === correct) {
+                canTap = false;
+                const points = POINTS_MAP[currentDifficulty];
+                score += points;
+                document.getElementById('score-text').innerText = `🌰 ${score}`;
+
+                playSound('correct');
+                btn.classList.add('correct-anim');
+                feedback.innerHTML = `<span class="text-emerald-700">🎉 太棒了！答對囉！(+${points}🌰)</span>`;
+
+                setTimeout(() => {
+                    currentIdx++;
+                    if (currentIdx < 10) {
+                        renderQuestion();
+                    } else {
+                        showVictory();
+                    }
+                }, 1100);
+
+            } else {
+                playSound('wrong');
+                btn.classList.add('wrong-anim');
+                feedback.innerHTML = `<span class="text-rose-600">💪 差一點點，再試試看喔！</span>`;
+
+                setTimeout(() => {
+                    btn.classList.remove('wrong-anim');
+                }, 500);
+            }
+        }
+
+        function showVictory() {
+            playSound('win');
+            document.getElementById('game-stage').classList.add('hidden');
+            document.getElementById('victory-stage').classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = `🌰 ${score}`;
+            const desc = document.getElementById('victory-desc');
+            const badge = document.getElementById('final-badge');
+
+            if (currentDifficulty === 'low') {
+                desc.innerText = "你完成初級的所有數學考驗！基本功超棒！";
+                badge.innerText = "森林數理萌芽獎 🥇";
+            } else if (currentDifficulty === 'mid') {
+                desc.innerText = "你成功攻克中級闖關！邏輯非常清晰！";
+                badge.innerText = "森林計算小能手 🏆";
+            } else {
+                desc.innerText = "太厲害了！高級難度全通關！你是數學小天才！";
+                badge.innerText = "森林數學大師 👑";
+            }
+        }
+
+        function upgradeDifficulty() {
+            if (currentDifficulty === 'low') changeDifficulty('mid');
+            else if (currentDifficulty === 'mid') changeDifficulty('high');
+            else changeDifficulty('low');
+        }
+
+        // Initialize on Load
+        window.onload = function() {
+            changeDifficulty('low');
+        };
+    </script>
 </body>
 </html>
